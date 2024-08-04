@@ -3,16 +3,11 @@ import sys
 import random
 import time
 
+from colorama import init as colorama_init
+from colorama import Fore
+from colorama import Style
 
-"""
-O — empty
-M — missed
-H — hit
-D — destroyed
-S — ship
-V — not allowed to hit
-N — not allowed to place
-"""
+colorama_init()
 
 
 class Player:
@@ -134,14 +129,18 @@ class Game:
             self.player_1.name = name
         print("If you would like to fill your board manually, type A. If you choose a random layout, type B below")
         option = input("Your choice: ")
+        while option != "A".lower() and option != "B".lower():
+            option = input("Please, make a sound choice: ")
 
-        if option == "A":
+        if option == "A".lower():
             self.player_manual_placement()
-        elif not option or option == "B":
+        elif not option or option == "B".lower():
             self.random_ship_placement("human")
 
         # remove all Vs from the board
         self.board_1.clear_shades()
+
+        print("To shoot, type the row and the column of the target separated by the space, e.g. 4 6")
 
     def create_ships(self):
         self.p1_battleship = Ship(self.player_1, 4)
@@ -241,43 +240,49 @@ class Game:
 
             board.place_ship(ship, row, col, orient)
 
-    def place_player_ships_scripted(self):
-        self.board_1.place_ship(self.p1_battleship, 4, 0, "v")
-        self.board_1.place_ship(self.p1_cruiser_1, 1, 0, "h")
-        self.board_1.place_ship(self.p1_cruiser_2, 1, 4, "h")
-        self.board_1.place_ship(self.p1_destroyer_1, 3, 5, "h")
-        self.board_1.place_ship(self.p1_destroyer_2, 1, 8, "v")
-        self.board_1.place_ship(self.p1_destroyer_3, 4, 8, "v")
-        self.board_1.place_ship(self.p1_submarine_1, 6, 3, "n")
-        self.board_1.place_ship(self.p1_submarine_2, 6, 5, "n")
-        self.board_1.place_ship(self.p1_submarine_3, 8, 7, "n")
-        self.board_1.place_ship(self.p1_submarine_4, 9, 9, "n")
-
-    def place_enemy_ships_scripted(self):
-        self.board_2.place_ship(self.p2_battleship, 3, 3, "v")
-        self.board_2.place_ship(self.p2_cruiser_1, 1, 5, "h")
-        self.board_2.place_ship(self.p2_cruiser_2, 2, 9, "v")
-        self.board_2.place_ship(self.p2_destroyer_1, 0, 0, "h")
-        self.board_2.place_ship(self.p2_destroyer_2, 2, 1, "v")
-        self.board_2.place_ship(self.p2_destroyer_3, 9, 0, "h")
-        self.board_2.place_ship(self.p2_submarine_1, 0, 9, "n")
-        self.board_2.place_ship(self.p2_submarine_2, 9, 3, "n")
-        self.board_2.place_ship(self.p2_submarine_3, 8, 5, "n")
-        self.board_2.place_ship(self.p2_submarine_4, 8, 7, "n")
-
     def play(self):
         def draw_fields():
-            print("Your field              Enemy field")
+            """
+            O — empty
+            M — missed
+            H — hit
+            D — destroyed
+            S — ship
+            V — not allowed to hit
+            N — not allowed to place
+            """
+
+            print(f"{Fore.GREEN}Your field{Style.RESET_ALL}              {Fore.RED}Enemy field{Style.RESET_ALL}")
             print("  0 1 2 3 4 5 6 7 8 9 \t  0 1 2 3 4 5 6 7 8 9")
             for i in range(10):
                 print(i, end=" ")
                 for c in self.board_1.board_inner[i]:
-                    print(c, end=" ")
+                    if c == "O":
+                        print(f"{Fore.BLUE}{c}{Style.RESET_ALL}", end=" ")
+                    elif c == "M":
+                        print(f"{Fore.BLACK}{c}{Style.RESET_ALL}", end=" ")
+                    elif c == "H":
+                        print(f"{Fore.YELLOW}{c}{Style.RESET_ALL}", end=" ")
+                    elif c == "D":
+                        print(f"{Fore.RED}{c}{Style.RESET_ALL}", end=" ")
+                    else:
+                        print(c, end=" ")
                 print("\t", end="")
 
                 print(i, end=" ")
                 for c in self.board_2.board_outer[i]:
-                    print(c, end=" ")
+                    if c == "O":
+                        print(f"{Fore.BLUE}{c}{Style.RESET_ALL}", end=" ")
+                    elif c == "M":
+                        print(f"{Fore.BLACK}{c}{Style.RESET_ALL}", end=" ")
+                    elif c == "H":
+                        print(f"{Fore.YELLOW}{c}{Style.RESET_ALL}", end=" ")
+                    elif c == "D":
+                        print(f"{Fore.RED}{c}{Style.RESET_ALL}", end=" ")
+                    elif c == "V":
+                        print(f"{Fore.BLACK}{c}{Style.RESET_ALL}", end=" ")
+                    else:
+                        print(c, end=" ")
                 print()
 
         def make_turn(order: list):
@@ -286,8 +291,8 @@ class Game:
                 while not self.board_2.board_outer[row][col] == "O":
                     row, col = map(int, input(f"{order[0][0].name}, you can't hit this tile, try again: ").split())
             else:
-                print(f"{order[0][0].name} makes their turn...")
-                # time.sleep(2)
+                print(f"{order[0][0].name} makes its turn...")
+                time.sleep(1.5)
 
                 row, col = random.randint(0, 9), random.randint(0, 9)
                 while not self.board_1.board_outer[row][col] == "O":
@@ -374,3 +379,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# at the end show, how many turns the game took
+# colors in the option A
