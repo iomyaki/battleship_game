@@ -129,7 +129,7 @@ class Game:
             self.player_1.name = name
         print("If you would like to fill your board manually, type A. If you choose a random layout, type B below")
         option = input("Your choice: ")
-        while option != "A".lower() and option != "B".lower():
+        while option.lower() != "a" and option.lower() != "b":
             option = input("Please, make a sound choice: ")
 
         if option == "A".lower():
